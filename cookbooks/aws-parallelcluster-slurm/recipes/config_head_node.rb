@@ -67,7 +67,8 @@ unless virtualized?
     command "#{node['cluster']['cookbook_virtualenv_path']}/bin/python #{node['cluster']['scripts_dir']}/slurm/pcluster_slurm_config_generator.py"\
             " --output-directory #{node['cluster']['slurm']['install_dir']}/etc/ --template-directory #{node['cluster']['scripts_dir']}/slurm/templates/"\
             " --input-file #{node['cluster']['cluster_config_path']}  --instance-types-data #{node['cluster']['instance_types_data_path']}"\
-            " --compute-node-bootstrap-timeout #{node['cluster']['compute_node_bootstrap_timeout']} #{no_gpu}"
+            " --compute-node-bootstrap-timeout #{node['cluster']['compute_node_bootstrap_timeout']} #{no_gpu}"\
+            " --realmemory-to-ec2memory-ratio #{node['cluster']['realmemory_to_ec2memory_ratio']}"
   end
 end
 
@@ -194,14 +195,26 @@ template '/etc/systemd/system/slurmctld.service' do
 end
 
 if node['cluster']['add_node_hostnames_in_hosts_file'] == "true"
-  cookbook_file "#{node['cluster']['slurm']['install_dir']}/etc/pcluster/prolog" do
+  directory "#{node['cluster']['slurm']['install_dir']}/etc/pcluster/prolog.d" do
+    user 'root'
+    group 'root'
+    mode '0755'
+  end
+
+  cookbook_file "#{node['cluster']['slurm']['install_dir']}/etc/pcluster/prolog.d/01-pcluster-prolog" do
     source 'head_node_slurm/prolog'
     owner node['cluster']['slurm']['user']
     group node['cluster']['slurm']['group']
     mode '0744'
   end
 
-  cookbook_file "#{node['cluster']['slurm']['install_dir']}/etc/pcluster/epilog" do
+  directory "#{node['cluster']['slurm']['install_dir']}/etc/pcluster/epilog.d" do
+    user 'root'
+    group 'root'
+    mode '0755'
+  end
+
+  cookbook_file "#{node['cluster']['slurm']['install_dir']}/etc/pcluster/epilog.d/01-pcluster-epilog" do
     source 'head_node_slurm/epilog'
     owner node['cluster']['slurm']['user']
     group node['cluster']['slurm']['group']

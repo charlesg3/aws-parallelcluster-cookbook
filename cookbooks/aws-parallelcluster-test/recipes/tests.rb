@@ -99,6 +99,13 @@ if node['cluster']['scheduler'] == 'slurm'
       command "ls #{node['cluster']['slurm']['install_dir']}"
       user node['cluster']['cluster_user']
     end
+    execute 'check cgroup memory resource controller is enabled' do
+      # We expect a 1 in the fourth field of the cgroups table, which is formatted as follows:
+      # subsys_name  hierarchy  num_cgroups  enabled
+      # ...
+      # memory       <int>      <int>        1
+      command "test $(grep memory /proc/cgroups | awk '{print $4}') = 1"
+    end
   else
     raise "node_type must be HeadNode or ComputeFleet"
   end
@@ -268,11 +275,6 @@ if node['conditions']['efa_supported']
         modinfo efa
         grep "EFA installer version: #{node['cluster']['efa']['installer_version']}" /opt/amazon/efa_installed_packages
       EFA
-    end
-    # GDR (GPUDirect RDMA)
-    execute 'check efa gdr installed' do
-      command "modinfo efa | grep 'gdr:\ *Y'"
-      user node['cluster']['cluster_user']
     end
   end
 end

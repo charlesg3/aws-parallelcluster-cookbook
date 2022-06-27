@@ -7,17 +7,42 @@ x.x.x
 ------
 
 **ENHANCEMENTS**
-- Add support for enabling JWT authentication Slurm.
 - Add support for multiple Elastic File Systems.
 - Add support for multiple FSx File System.
+- Add support for attaching existing FSx for Ontap and FSx for OpenZFS File Systems.
+- Install NVIDIA GDRCopy 2.3 to enable low-latency GPU memory copy on supported instance types.
 - Slurm: Set `AuthInfo=cred_expire=70` to reduce the time requeued jobs must wait before starting again when nodes are not available.
 - Make `DirectoryService/AdditionalSssdConfigs` be merged into final SSSD configuration rather than be appended.
 - During cluster update set Slurm nodes state accordingly to strategy set through QueueUpdateStrategy parameter.
+- Add new configuration parameter `Scheduling/SlurmSettings/EnableMemoryBasedScheduling` to configure memory-based
+  scheduling in Slurm.
+  - Move `SelectTypeParameters` and `ConstrainRAMSpace` to the `parallelcluster_slurm*.conf` include files.
+  - Add new configuration parameter to override default value of schedulable memory on compute nodes.
+- Add support for rebooting compute nodes via Slurm.
 
 **CHANGES**
 - Slurm: Restart `clustermgtd` and `slurmctld` daemons at cluster update time only when `Scheduling` parameters are updated in the cluster configuration.
-- Upgrade Slurm to version 21.08.8.
 - Update slurmctld and slurmd systemd service files.
+- Upgrade NICE DCV to version 2022.0-12760.
+- Upgrade NVIDIA driver to version 470.129.06.
+- Upgrade NVIDIA Fabric Manager to version 470.129.06.
+- Upgrade EFA installer to version 1.16.0.
+  - EFA driver: ``efa-1.16.0-1``
+  - EFA configuration: ``efa-config-1.10-1``
+  - EFA profile: ``efa-profile-1.5-1``
+  - Libfabric: ``libfabric-aws-1.15.1.amzn1.0-1``
+  - RDMA core: ``rdma-core-39.0-2``
+  - Open MPI: ``openmpi40-aws-4.1.2-2``
+- Restrict IPv6 access to IMDS to root and cluster admin users only.
+
+3.1.4
+------
+
+**CHANGES**
+- Upgrade Slurm to version 21.08.8.
+
+**ENHANCEMENTS**
+- Add support for enabling JWT authentication Slurm.
 
 3.1.3
 ------
